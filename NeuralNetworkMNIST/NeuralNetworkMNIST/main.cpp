@@ -8,7 +8,11 @@
 #include <stdlib.h>
 #include <cmath>
 #include <conio.h>  
+#include <chrono>
+#include <ratio>
+#include <ctime>
 
+typedef std::chrono::steady_clock Clock;
 
 #include "mnist_dataset_reader.h"
 #include "NeuralNetwork.h"
@@ -19,11 +23,22 @@ using namespace std;
 
 int main()
 {
-
-	string path_to_extracted_mnist_files = "C:\\Users\\marc.se\\Documents\\Visual Studio 2015\\Projects\\MNIST_Reader\\MNIST";										//Path to read images
-	string path_to_matrix_save = "C:\\Users\\marc.se\\Documents\\Visual Studio 2015\\Projects\\NeuralNetworkMNIST\\NeuralNetworkMNIST\\Data\\Matrix.txt";			//Path to save our NN matrix.
+	int choice = 5;
+	string path_to_extracted_mnist_files = "MNIST";										//Path to read images
+	string path_to_matrix_save = "Data\\Matrix.txt";			//Path to save our NN matrix.
 	mnist_dataset_reader my_reader(path_to_extracted_mnist_files);
 	NeuralNetwork network;
+
+	int prediction = 0;
+	float accuracy = 0.0;
+
+	Eigen::initParallel();
+	Eigen::setNbThreads(8);
+	cout << "Eigen threads: " << Eigen::nbThreads() << endl;
+
+	Clock::time_point startTimer = Clock::now();
+	Clock::time_point endTimer = Clock::now();
+	double timeSpent = 0.0;
 
 	/*
 	Mat* img = my_reader.get_mnist_image_as_cvmat(my_reader.get_train_images(), sample);
@@ -34,34 +49,92 @@ int main()
 
 
 	//NEURAL NETWORK
-
-	network.init_array();
-
-	//Loop in the 60000 example of the traning set images and train our network.
-
-	for (int sample = 1; sample < 60000; ++sample)																													
+	while (choice != 0)
 	{
 
-		network.inputNetwork(my_reader.get_train_images(), my_reader.get_train_labels(), sample);
+	cout << "1 : Train model" << endl << "2 : Test model (if already trained)" << endl << "0 : Quit" << endl;
+	cin >> choice;
 
-		int nIterations = network.Network_Learning();
 
-		// Write down the squared error
-		cout << "Sample: " << sample << endl;
-		cout << "No. iterations: " << nIterations << endl;
-		cout << "Error : " << network.square_error() << endl;
-
-		//Save intermediate network
-		if (sample % 100 == 0)
+		switch (choice)
 		{
-			cout << "Saving the network to :" << path_to_matrix_save << " file." << endl;
+
+		case 1:
+
+			//Loop in the 60000 example of the traning set images and train our network.
+
+			startTimer = Clock::now();
+
+			network.init_array();
+
+			for (int sample = 1; sample <= 100; ++sample)
+			{
+
+				network.inputNetwork(my_reader.get_train_images(), my_reader.get_train_labels(), sample);
+
+				int nIterations = network.Network_Learning();
+
+				// Write down the squared error
+				cout << "Sample: " << sample << endl;
+				cout << "No. iterations: " << nIterations << endl;
+				cout << "Error : " << network.square_error() << endl;
+
+				//Save intermediate network
+				//if (sample % 100 == 0)
+				//{
+				//	cout << "Saving the network to :" << path_to_matrix_save << " file." << endl;
+				//	network.MatrixToFile(path_to_matrix_save);
+				//}
+			}
+
+			//Save final network
 			network.MatrixToFile(path_to_matrix_save);
+
+			endTimer = Clock::now();
+			
+			timeSpent = (endTimer - startTimer).count()  * ((double)Clock::period::num / Clock::period::den);;
+			
+
+			cout << "Time spent : " << timeSpent << " secondes" << endl;
+
+			break;
+
+		case 2:
+
+			//prediction = 0;
+			network.init_array();
+			network.Load_NeuralNetwork_Model(path_to_matrix_save);
+
+
+			for (int sample = 0; sample < 1000; ++sample)
+			{
+				network.inputNetwork(my_reader.get_test_images(), my_reader.get_test_labels(), sample);
+
+				network.ForwardPropagation();
+				prediction += network.Prediction();
+			}
+
+			cout << endl << "Number of good prediction : " << prediction << endl << endl;
+			accuracy = network.accuracy(prediction, 9000);
+			cout << "Accuracy : " << accuracy << "%" << endl <<  endl;
+
+			break;		
+
+		default:
+
+			cout << "Enter a good choice" << endl;
+			break;
+
+
 		}
+
 	}
 
 
-	//Save final network
-	network.MatrixToFile(path_to_matrix_save);
+
+
+
+
 
 	
 	/*

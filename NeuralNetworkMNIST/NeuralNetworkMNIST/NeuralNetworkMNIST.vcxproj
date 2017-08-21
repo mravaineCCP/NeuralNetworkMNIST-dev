@@ -132,12 +132,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -150,12 +151,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -174,6 +176,7 @@
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\opencv3.1.redist.1.0\build\native\opencv3.1.redist.targets" Condition="Exists('..\packages\opencv3.1.redist.1.0\build\native\opencv3.1.redist.targets')" />
     <Import Project="..\packages\opencv3.1.1.0\build\native\opencv3.1.targets" Condition="Exists('..\packages\opencv3.1.1.0\build\native\opencv3.1.targets')" />
+    <Import Project="..\packages\Eigen.3.3.3\build\native\Eigen.targets" Condition="Exists('..\packages\Eigen.3.3.3\build\native\Eigen.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -181,5 +184,6 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\opencv3.1.redist.1.0\build\native\opencv3.1.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\opencv3.1.redist.1.0\build\native\opencv3.1.redist.targets'))" />
     <Error Condition="!Exists('..\packages\opencv3.1.1.0\build\native\opencv3.1.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\opencv3.1.1.0\build\native\opencv3.1.targets'))" />
+    <Error Condition="!Exists('..\packages\Eigen.3.3.3\build\native\Eigen.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Eigen.3.3.3\build\native\Eigen.targets'))" />
   </Target>
 </Project>

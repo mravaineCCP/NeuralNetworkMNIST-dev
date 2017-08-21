@@ -3,6 +3,7 @@
 #define NEURALNETWORK_H
 
 #include <string>
+#include <Eigen/Dense>
 
 /*Setup for the Neural network
 * The setup for this neural network is based on 3 Layer : Input Layer - 1 Hidden layer - Output Layer
@@ -15,23 +16,25 @@ public :
 	
 	void init_array();
 
-	double Sigmoid(double input);
+	Eigen::VectorXf Sigmoid(const Eigen::VectorXf& input);
 
 	void  ForwardPropagation();
 
 	void BackwardPropagation();
 
-	double square_error();
+	float square_error();
+
+	float accuracy(int correct_predictions, int test_iterations);
 
 	void inputNetwork(unsigned char** images, unsigned char* label, int image_idx);
 
 	int Network_Learning();
 
-	void MatrixToFile(std::string file_name);
+	void MatrixToFile(const std::string& file_name);
 
-	void Load_NeuralNetwork_Mode(std::string file_name);
+	void Load_NeuralNetwork_Model(const std::string& file_name);
 
-	void Prediction();
+	int Prediction();
 
 private :
 
@@ -50,32 +53,44 @@ private :
 
 		//Tweak this settings depending on the error result of the Learning process
 
-	const double learningRate = 0.001;
+	const float learningRate = 0.001f;
 
 		//Momentum of Delta of Backward propagation
 
-	const double momentum = 0.9;
+	const float momentum = 0.9f;
 
 		//Number of Iteration from the neural network on a specific training example
 
-	const static int num_Iterations = 512;
+	const static int num_Iterations = 512; //512
 
 		//Error minimum
 
-	const double epsilon = 0.001;
+	const float epsilon = 0.001f;
 
 		//Input Layer to Hidden Layer
 
-	double *weight1[num_InputNeurons], *delta1[num_InputNeurons], *out1;
+	Eigen::MatrixXf weight1;
+	Eigen::MatrixXf delta1;
+
+	Eigen::VectorXf out1;
 
 		//Hidden Layer to Output Layer
 
-	double *weight2[num_HiddenNeurons], *in2, *delta2[num_HiddenNeurons], *out2, *theta2;;
+	Eigen::MatrixXf weight2;
+	Eigen::MatrixXf delta2;
+
+	Eigen::VectorXf  in2;
+	Eigen::VectorXf  out2;
+	Eigen::VectorXf  theta2;
 
 		//Output layer
 
-	double *in3, *out3, *theta3;
-	double expectedValue[num_OutputNeurons];
+	Eigen::VectorXf expectedValue;
+
+	Eigen::VectorXf in3;
+	Eigen::VectorXf out3;
+	Eigen::VectorXf theta3;
+
 
 		//Image 28x28 GrayScale value
 
@@ -84,8 +99,8 @@ private :
 
 		//Bit Data of image
 
-	int image[image_Width][image_Height];
-
+	Eigen::MatrixXf image;
+	int image_Label = 0;
 
 };
 #endif // !NEURALNETWORK_H
